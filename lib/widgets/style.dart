@@ -48,6 +48,7 @@ const sheetBackground = Color(0xFFf0f2f4);
 const Color lightGrey = Color(0xFF9b9b9b);
 const Color lightBrown2 = Color(0xFFa79571);
 const Color blueGrey2 = Color(0xFF7d8ca3);
+const Color brown = Color(0xFF540C11);
 
 neoRadioStyle() => const NeumorphicRadioStyle(unselectedColor: whiteBackground);
 neoRadioStyleChoose() => const NeumorphicRadioStyle(

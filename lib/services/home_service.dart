@@ -6,7 +6,8 @@ import 'package:dart_date/dart_date.dart';
 import 'package:tep_flutter/widgets/tools.dart';
 
 class HomeService {
-  Future<NowInfo> initData() async {
+  Future<Map<String, dynamic>> initData() async {
+    Map<String, dynamic> result;
     NowInfo nowInfo = NowInfo(now: DateTime.now());
     List<DayInfo> dayInfo = await SpService().getDayInfos();
     nowInfo.tepType = await SpService().getTepType();
@@ -42,12 +43,19 @@ class HomeService {
           break;
         default:
       }
-      return nowInfo;
+      result = {
+        'dayInfo': dayInfo,
+        'nowInfo': nowInfo,
+      };
+      return result;
     }
 
     nowInfo = checkTime(nowInfo);
-
-    return nowInfo;
+    result = {
+      'dayInfo': dayInfo,
+      'nowInfo': nowInfo,
+    };
+    return result;
   }
 
   NowInfo checkTime(NowInfo nowInfo) {
@@ -55,7 +63,7 @@ class HomeService {
     TimeOfDay timeNow = TimeOfDay.fromDateTime(nowInfo.now);
     if (nowInfo.tepType == TepType.twoWay) {
       if (timeNow.isBetween(const TimeOfDay(hour: 7, minute: 30),
-          const TimeOfDay(hour: 22, minute: 30))) {
+          const TimeOfDay(hour: 22, minute: 29))) {
         nowInfo.timeType = TimeType.peak;
         if (nowInfo.monthType == MonthType.sunmer) {
           nowInfo.price = TePrice.sunmer2Peak;
@@ -73,17 +81,17 @@ class HomeService {
     } else {
       if (nowInfo.monthType == MonthType.sunmer) {
         if (timeNow.isBetween(const TimeOfDay(hour: 10, minute: 00),
-                const TimeOfDay(hour: 12, minute: 00)) ||
+                const TimeOfDay(hour: 11, minute: 59)) ||
             timeNow.isBetween(const TimeOfDay(hour: 13, minute: 00),
-                const TimeOfDay(hour: 17, minute: 00))) {
+                const TimeOfDay(hour: 16, minute: 59))) {
           nowInfo.timeType = TimeType.peak;
           nowInfo.price = TePrice.sunmer3Peak;
         } else if (timeNow.isBetween(const TimeOfDay(hour: 7, minute: 30),
-                const TimeOfDay(hour: 10, minute: 00)) ||
+                const TimeOfDay(hour: 9, minute: 59)) ||
             timeNow.isBetween(const TimeOfDay(hour: 12, minute: 00),
-                const TimeOfDay(hour: 13, minute: 00)) ||
+                const TimeOfDay(hour: 12, minute: 59)) ||
             timeNow.isBetween(const TimeOfDay(hour: 17, minute: 00),
-                const TimeOfDay(hour: 22, minute: 30))) {
+                const TimeOfDay(hour: 22, minute: 29))) {
           nowInfo.timeType = TimeType.halfPeak;
           nowInfo.price = TePrice.sunmer3HalfPeak;
         } else {
@@ -92,7 +100,7 @@ class HomeService {
         }
       } else {
         if (timeNow.isBetween(const TimeOfDay(hour: 7, minute: 30),
-            const TimeOfDay(hour: 22, minute: 30))) {
+            const TimeOfDay(hour: 22, minute: 29))) {
           nowInfo.timeType = TimeType.halfPeak;
           nowInfo.price = TePrice.nonsunmer3HalfPeak;
         } else {

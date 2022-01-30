@@ -3,19 +3,18 @@ import 'dart:async';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flex_color_scheme/flex_color_scheme.dart';
-import 'package:flutter/material.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_neumorphic/flutter_neumorphic.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:provider/provider.dart';
 import 'package:tep_flutter/firebase_options.dart';
-import 'package:tep_flutter/models/now_info.dart';
 import 'package:tep_flutter/providers/home_provider.dart';
 import 'package:tep_flutter/providers/theme_provider.dart';
 import 'package:tep_flutter/screens/home.dart';
 import 'package:tep_flutter/services/home_service.dart';
 import 'package:tep_flutter/widgets/style.dart';
-
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'tabs_page.dart';
 
 Future<void> main() async {
@@ -35,35 +34,83 @@ Future<void> main() async {
   );
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   const MyApp({Key? key}) : super(key: key);
 
   static FirebaseAnalytics analytics = FirebaseAnalytics.instance;
   static FirebaseAnalyticsObserver observer =
       FirebaseAnalyticsObserver(analytics: analytics);
 
-  Future<NowInfo> initData() => HomeService().initData();
+  @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  Future<Map<String, dynamic>> initData() => HomeService().initData();
+
+  @override
+  void initState() {
+    super.initState();
+    initThemeMode();
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+  }
+
+  Future<void> initThemeMode() async {
+    await context.read<ThemeChanger>().initThemeMode();
+  }
 
   @override
   Widget build(BuildContext context) {
-    context.read<ThemeChanger>().initThemeMode();
+    // Future.delayed(const Duration(seconds: 1), () {});
     ThemeMode themeMode = context.watch<ThemeChanger>().getTheme;
-    final spinkit = SpinKitChasingDots(
+    const spinkit = SpinKitChasingDots(
       // color: Color(0xFF1C1C1E),
-      color: Theme.of(context).backgroundColor,
+      color: blueGrey2,
     );
     return MaterialApp(
       title: '時間電價',
+      localizationsDelegates: const [
+        GlobalMaterialLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+      ],
+      supportedLocales: const [
+        Locale('en'),
+        Locale.fromSubtags(languageCode: 'zh'), // generic Chinese 'zh'
+        Locale.fromSubtags(
+            languageCode: 'zh',
+            scriptCode: 'Hans'), // generic simplified Chinese 'zh_Hans'
+        Locale.fromSubtags(
+            languageCode: 'zh',
+            scriptCode: 'Hant'), // generic traditional Chinese 'zh_Hant'
+        Locale.fromSubtags(
+            languageCode: 'zh',
+            scriptCode: 'Hans',
+            countryCode: 'CN'), // 'zh_Hans_CN'
+        Locale.fromSubtags(
+            languageCode: 'zh',
+            scriptCode: 'Hant',
+            countryCode: 'TW'), // 'zh_Hant_TW'
+        Locale.fromSubtags(
+            languageCode: 'zh',
+            scriptCode: 'Hant',
+            countryCode: 'HK'), // 'zh_Hant_HK'
+      ],
+
       theme: FlexColorScheme.light(
         scheme: FlexScheme.rosewood,
         visualDensity: FlexColorScheme.comfortablePlatformDensity,
       )
           .copyWith(
             scaffoldBackground: whiteBackground,
-            background: backGroundBlack,
+            background: whiteBackground,
             textTheme: const TextTheme(
               headline6: TextStyle(
-                  color: whiteSmoke,
+                  // color: whiteSmoke,
                   fontSize: 18,
                   fontWeight: FontWeight.normal),
             ),
@@ -76,17 +123,18 @@ class MyApp extends StatelessWidget {
       )
           .copyWith(
             scaffoldBackground: backGroundBlack,
-            background: whiteBackground,
+            background: Colors.black,
             textTheme: const TextTheme(
               headline6: TextStyle(
-                  color: backGroundBlack,
+                  // color: backGroundBlack,
                   fontSize: 18,
                   fontWeight: FontWeight.normal),
             ),
           )
           .toTheme,
       themeMode: themeMode,
-      navigatorObservers: <NavigatorObserver>[observer],
+      navigatorObservers: <NavigatorObserver>[MyApp.observer],
+      builder: EasyLoading.init(),
       home: NeumorphicTheme(
         themeMode: themeMode, //or dark / system
         darkTheme: const NeumorphicThemeData(
@@ -98,8 +146,6 @@ class MyApp extends StatelessWidget {
           defaultTextColor: backGroundBlack,
         ),
         child: Scaffold(
-          // backgroundColor:
-          //     FlexColor.schemes[FlexScheme.hippieBlue]!.light.primary,
           body: FutureBuilder(
             future: initData(),
             builder: (context, snapshot) {
@@ -109,11 +155,16 @@ class MyApp extends StatelessWidget {
                   return spinkit;
                 default:
                   if (snapshot.hasData) {
-                    debugPrint('snapshot.hasData');
                     context
                         .read<HomeProvider>()
-                        .initNowInfo(snapshot.data as NowInfo);
-                    return const Home();
+                        .initNowInfo((snapshot.data! as Map)['nowInfo']);
+                    context
+                        .read<HomeProvider>()
+                        .initDayInfo((snapshot.data! as Map)['dayInfo']);
+                    // context
+                    //     .read<ThemeChanger>()
+                    //     .setTheme((snapshot.data! as Map)['themeMode']);
+                    return Home();
                   } else if (snapshot.hasError) {
                     debugPrint('snapshot.hasError');
                     return spinkit;
@@ -419,4 +470,20 @@ class _MyHomePageState extends State<MyHomePage> {
       ),
     );
   }
+}
+
+void configLoading() {
+  EasyLoading.instance
+    ..displayDuration = const Duration(milliseconds: 2000)
+    ..indicatorType = EasyLoadingIndicatorType.fadingCircle
+    ..loadingStyle = EasyLoadingStyle.dark
+    ..indicatorSize = 45.0
+    ..radius = 10.0
+    ..progressColor = Colors.yellow
+    ..backgroundColor = Colors.green
+    ..indicatorColor = Colors.yellow
+    ..textColor = Colors.yellow
+    ..maskColor = Colors.blue.withOpacity(0.5)
+    ..userInteractions = true
+    ..dismissOnTap = false;
 }

@@ -10,6 +10,14 @@ class AdUnitId {
   static final String bannerId = Platform.isAndroid
       ? 'ca-app-pub-1486315568349807/7923892362'
       : 'ca-app-pub-1486315568349807/4299314457';
+
+  static final String testInterstitialId = Platform.isAndroid
+      ? 'ca-app-pub-3940256099942544/1033173712'
+      : 'ca-app-pub-3940256099942544/4411468910';
+
+  static final String interstitialId = Platform.isAndroid
+      ? 'ca-app-pub-1486315568349807/7212142582'
+      : 'ca-app-pub-1486315568349807/8413543619';
 }
 
 enum HolidayType {

@@ -1,285 +1,170 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:flutter/material.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_inner_drawer/inner_drawer.dart';
 import 'package:flutter_neumorphic/flutter_neumorphic.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
-import 'package:tep_flutter/main.dart';
 import 'package:tep_flutter/providers/theme_provider.dart';
-import 'package:tep_flutter/services/home_service.dart';
+import 'package:tep_flutter/widgets/admob.dart';
+import 'package:tep_flutter/widgets/calendar.dart';
+import 'package:tep_flutter/widgets/caltep.dart';
 import 'package:tep_flutter/widgets/show_now_info.dart';
-import 'package:tep_flutter/widgets/style.dart';
-import 'package:tep_flutter/widgets/tools.dart';
 import 'package:provider/provider.dart';
-import 'package:tep_flutter/models/now_info.dart';
-import 'package:tep_flutter/providers/home_provider.dart';
+import 'package:tep_flutter/widgets/tools.dart';
+import 'package:url_launcher/url_launcher.dart';
 
-class Home extends StatefulWidget {
-  const Home({Key? key}) : super(key: key);
+// ignore: must_be_immutable
+class Home extends StatelessWidget {
+  Home({Key? key}) : super(key: key);
 
-  @override
-  _HomeState createState() => _HomeState();
-}
+  Timer? _timer;
+  late double _progress;
+  InterstitialAd? _interstitialAd;
+  int _numInterstitialLoadAttempts = 0;
+  int maxFailedLoadAttempts = 3;
 
-class _HomeState extends State<Home> {
-  //TODO::Google Admod
-  static const _insets = 12.0;
-  BannerAd? _inlineAdaptiveAd;
-  AdSize? _adSize;
-  late Orientation _currentOrientation;
-  bool _isLoaded = false;
-  double get _adWidth => MediaQuery.of(context).size.width - (2 * _insets);
-  final GlobalKey _scaffoldKey = GlobalKey();
-
-  @override
-  void initState() {
-    super.initState();
-    //TODO::Admob
-    _loadAd();
+  //TODO:: Admob
+  Future<void> _createInterstitialAd() async {
+    InterstitialAd.load(
+        //TODO: chang id when release
+        adUnitId: AdUnitId.testInterstitialId,
+        request: const AdRequest(),
+        adLoadCallback: InterstitialAdLoadCallback(
+          onAdLoaded: (InterstitialAd ad) {
+            debugPrint('$ad loaded');
+            _interstitialAd = ad;
+            _numInterstitialLoadAttempts = 0;
+            _interstitialAd!.setImmersiveMode(true);
+          },
+          onAdFailedToLoad: (LoadAdError error) {
+            debugPrint('InterstitialAd failed to load: $error.');
+            _numInterstitialLoadAttempts += 1;
+            _interstitialAd = null;
+            if (_numInterstitialLoadAttempts <= maxFailedLoadAttempts) {
+              _createInterstitialAd();
+            }
+          },
+        ));
   }
 
-  @override
-  void didChangeDependencies() {
-    _currentOrientation = MediaQuery.of(context).orientation;
-    context.read<HomeProvider>().updateNowInfo();
-    //TODO::Admob
-    _loadAd();
-    super.didChangeDependencies();
-  }
-
-  @override
-  void dispose() {
-    _inlineAdaptiveAd?.dispose();
-    super.dispose();
-  }
-
-  void _loadAd() async {
-    await _inlineAdaptiveAd?.dispose();
-    setState(() {
-      _inlineAdaptiveAd = null;
-      _isLoaded = false;
-    });
-    // Get an inline adaptive size for the current orientation.
-    // AdSize size = AdSize.getCurrentOrientationInlineAdaptiveBannerAdSize(
-    //     _adWidth.truncate());
-
-    AdSize size = AdSize.banner;
-
-    _inlineAdaptiveAd = BannerAd(
-      //TODO: chang id when release
-      adUnitId: AdUnitId.testBannerId,
-      size: size,
-      request: const AdRequest(),
-      listener: BannerAdListener(
-        onAdLoaded: (Ad ad) async {
-          // debugPrint('Inline adaptive banner loaded: ${ad.responseInfo}');
-
-          // After the ad is loaded, get the platform ad size and use it to
-          // update the height of the container. This is necessary because the
-          // height can change after the ad is loaded.
-          BannerAd bannerAd = (ad as BannerAd);
-          final AdSize? size = await bannerAd.getPlatformAdSize();
-          if (size == null) {
-            debugPrint(
-                'Error: getPlatformAdSize() returned null for $bannerAd');
-            return;
-          }
-
-          setState(() {
-            _inlineAdaptiveAd = bannerAd;
-            _isLoaded = true;
-            _adSize = size;
-          });
-        },
-        onAdFailedToLoad: (Ad ad, LoadAdError error) {
-          // debugPrint('Inline adaptive banner failedToLoad: $error');
-          ad.dispose();
-        },
-      ),
-    );
-    await _inlineAdaptiveAd!.load();
-  }
-
-  //TODO::Admob
-  Widget _getAdWidget() {
-    return OrientationBuilder(
-      builder: (context, orientation) {
-        if (_currentOrientation == orientation &&
-            _inlineAdaptiveAd != null &&
-            _isLoaded &&
-            _adSize != null) {
-          return Align(
-              child: SizedBox(
-            width: _adWidth,
-            height: _adSize!.height.toDouble(),
-            child: AdWidget(
-              ad: _inlineAdaptiveAd!,
-            ),
-          ));
-        }
-        // Reload the ad if the orientation changes.
-        if (_currentOrientation != orientation) {
-          _currentOrientation = orientation;
-          _loadAd();
-        }
-        return Container();
+  void _showInterstitialAd() {
+    if (_interstitialAd == null) {
+      debugPrint('Warning: attempt to show interstitial before loaded.');
+      return;
+    }
+    _interstitialAd!.fullScreenContentCallback = FullScreenContentCallback(
+      onAdShowedFullScreenContent: (InterstitialAd ad) =>
+          debugPrint('ad onAdShowedFullScreenContent.'),
+      onAdDismissedFullScreenContent: (InterstitialAd ad) {
+        debugPrint('$ad onAdDismissedFullScreenContent.');
+        ad.dispose();
+        _createInterstitialAd();
+      },
+      onAdFailedToShowFullScreenContent: (InterstitialAd ad, AdError error) {
+        debugPrint('$ad onAdFailedToShowFullScreenContent: $error');
+        ad.dispose();
+        _createInterstitialAd();
       },
     );
+    _interstitialAd!.show();
+    _interstitialAd = null;
   }
 
   @override
   Widget build(BuildContext context) {
+    _createInterstitialAd();
     return Scaffold(
-      key: _scaffoldKey,
       floatingActionButtonLocation: FloatingActionButtonLocation.centerTop,
       floatingActionButton: Padding(
         padding: Platform.isAndroid
-            ? const EdgeInsets.symmetric(horizontal: 0, vertical: 32)
-            : const EdgeInsets.symmetric(horizontal: 0, vertical: 8),
+            ? const EdgeInsets.symmetric(horizontal: 8, vertical: 32)
+            : const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            TextButton(
-              child: Icon(
-                Icons.menu,
+            IconButton(
+              icon: Icon(
+                Icons.date_range,
                 color: Theme.of(context).iconTheme.color,
               ),
               onPressed: () {
                 showBarModalBottomSheet(
-                  barrierColor: Colors.transparent,
+                  expand: true,
                   context: context,
-                  builder: (context) => SizedBox.fromSize(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        ListTile(
-                          title: Text(
-                            '${DateTime.now().year}電價日曆',
-                            style: Theme.of(context).textTheme.headline6,
-                          ),
-                          onTap: () {
-                            // Update the state of the app.
-                            // ...
-                          },
-                        ),
-                        const Divider(),
-                        ListTile(
-                          title: Text(
-                            '電價說明',
-                            style: Theme.of(context).textTheme.headline6,
-                          ),
-                          onTap: () {
-                            // Update the state of the app.
-                            // ...
-                          },
-                        ),
-                        const Divider(),
-                        ListTile(
-                          title: Text(
-                            '電價試算',
-                            style: Theme.of(context).textTheme.headline6,
-                          ),
-                          onTap: () {
-                            // Update the state of the app.
-                            // ...
-                          },
-                        ),
-                        const Divider(),
-                      ],
-                    ),
-                  ),
+                  backgroundColor: Colors.transparent,
+                  builder: (context) => const Calendar(),
                 );
               },
             ),
-            _isLoaded
-                ? TextButton(
-                    child: Icon(
-                      context.watch<ThemeChanger>().getTheme == ThemeMode.light
-                          ? Icons.light_mode
-                          : Icons.dark_mode,
-                      color: Theme.of(context).iconTheme.color,
-                    ),
-                    onPressed: () {
-                      context.read<ThemeChanger>().toggleTheme();
-                    },
-                  )
-                : const SizedBox.shrink(),
+            IconButton(
+              icon: Icon(
+                Icons.calculate_outlined,
+                color: Theme.of(context).iconTheme.color,
+              ),
+              onPressed: () {
+                _showInterstitialAd();
+                showBarModalBottomSheet(
+                  expand: true,
+                  context: context,
+                  backgroundColor: Colors.transparent,
+                  builder: (context) => const CalTep(),
+                );
+              },
+            ),
+            IconButton(
+              icon: Icon(
+                Icons.info_outlined,
+                color: Theme.of(context).iconTheme.color,
+              ),
+              onPressed: () {
+                _progress = 0;
+                _timer?.cancel();
+                _timer = Timer.periodic(const Duration(milliseconds: 200),
+                    (Timer timer) {
+                  EasyLoading.showProgress(_progress,
+                      status:
+                          '${(_progress * 100).toStringAsFixed(0)}%\n\n電價說明以台電官方公告為準\n稍後將會開啟台電電價表');
+                  _progress += 0.03;
+                  if (_progress >= 1) {
+                    _timer?.cancel();
+                    EasyLoading.dismiss();
+                    launch(
+                        'https://www.taipower.com.tw/upload/238/2021111716354461653.pdf',
+                        forceSafariVC: false);
+                  }
+                });
+              },
+            ),
+            IconButton(
+              icon: Icon(
+                context.watch<ThemeChanger>().getTheme == ThemeMode.light
+                    ? Icons.light_mode
+                    : Icons.dark_mode,
+                color: Theme.of(context).iconTheme.color,
+              ),
+              onPressed: () {
+                context.read<ThemeChanger>().toggleTheme();
+              },
+            ),
           ],
         ),
       ),
-      drawer: Material(
-        child: Container(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              ListView(
-                shrinkWrap: true,
-                // Important: Remove any padding from the ListView.
-                padding: EdgeInsets.zero,
-                children: [
-                  ListTile(
-                    title: Text(
-                      '${DateTime.now().year}電價日曆',
-                      style: Theme.of(context).textTheme.headline6,
-                    ),
-                    onTap: () {
-                      // Update the state of the app.
-                      // ...
-                    },
-                  ),
-                  const Divider(),
-                  ListTile(
-                    title: Text(
-                      '電價說明',
-                      style: Theme.of(context).textTheme.headline6,
-                    ),
-                    onTap: () {
-                      // Update the state of the app.
-                      // ...
-                    },
-                  ),
-                  const Divider(),
-                  ListTile(
-                    title: Text(
-                      '電價試算',
-                      style: Theme.of(context).textTheme.headline6,
-                    ),
-                    onTap: () {
-                      // Update the state of the app.
-                      // ...
-                    },
-                  ),
-                  const Divider(),
-
-                  // Align(
-                  //   alignment: Alignment.bottomCenter,
-                  //   child: ElevatedButton(
-                  //     onPressed: () {},
-                  //     // style: ElevatedButton.styleFrom(
-                  //     //   // primary: Color(0xFF1877F2),
-                  //     //   shape: RoundedRectangleBorder(
-                  //     //       borderRadius: BorderRadius.all(Radius.circular(10))),
-                  //     // ),
-                  //     child: const Text('Logout'),
-                  //   ),
-                  // ),
-                ],
-              ),
-            ],
-          ),
-        ),
-      ),
       body: Column(
-        children: [
-          const Expanded(child: ShowNowInfo()),
+        children: const [
+          SizedBox(
+            height: 32,
+          ),
+          Expanded(child: ShowNowInfo()),
+          SizedBox(
+            height: 16,
+          ),
           Align(
               alignment: Alignment.bottomCenter,
-              child: SizedBox(height: 50, child: _getAdWidget())),
-          const SizedBox(
+              child: SizedBox(height: 50, child: GoogleBannerAd())),
+          SizedBox(
             height: 32,
           ),
         ],

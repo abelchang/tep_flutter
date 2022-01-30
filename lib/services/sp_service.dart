@@ -46,25 +46,34 @@ class SpService {
   }
 
   Future<void> setThemeMode(ThemeMode themeMode) async {
+    debugPrint('in setThemeMode');
+
     SharedPreferences localStorage = await SharedPreferences.getInstance();
     localStorage.setInt("themeMode", themeMode.index);
   }
 
   Future<ThemeMode> getThemeMode() async {
+    debugPrint('in getThemeMode');
     SharedPreferences localStorage = await SharedPreferences.getInstance();
     var themeModeData = localStorage.getInt("themeMode");
+    debugPrint('sp getThemeMode:' + themeModeData.toString());
     if (themeModeData == null) {
       return ThemeMode.system;
     }
     final themeMode = ThemeMode.values[themeModeData];
+    debugPrint('convert getThemeMode:' + themeMode.toString());
     switch (themeMode) {
       case ThemeMode.light:
+        debugPrint('switch ThemeMode.light');
         return ThemeMode.light;
       case ThemeMode.dark:
+        debugPrint('switch ThemeMode.dark');
         return ThemeMode.dark;
       case ThemeMode.system:
+        debugPrint('switch ThemeMode.system');
         return ThemeMode.system;
       default:
+        debugPrint('switch default ThemeMode.system');
         return ThemeMode.system;
     }
   }

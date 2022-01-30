@@ -6,30 +6,35 @@ class ThemeChanger with ChangeNotifier {
   final _brightness = SchedulerBinding.instance!.window.platformBrightness;
   var _themeMode = ThemeMode.system;
   get getTheme => _themeMode;
+
   setTheme(themeMode) {
     _themeMode = themeMode;
     notifyListeners();
   }
 
-  toggleTheme() {
+  toggleTheme() async {
     if (_themeMode == ThemeMode.dark) {
       _themeMode = ThemeMode.light;
     } else {
       _themeMode = ThemeMode.dark;
     }
-    debugPrint(_themeMode.toString());
+    await SpService().setThemeMode(_themeMode);
     notifyListeners();
   }
 
-  initThemeMode() {
-    if (_themeMode == ThemeMode.system) {
+  Future<void> initThemeMode() async {
+    ThemeMode local = await SpService().getThemeMode();
+    debugPrint('local:' + local.toString());
+    if (local == ThemeMode.system) {
       if (_brightness == Brightness.dark) {
         _themeMode = ThemeMode.dark;
       } else {
         _themeMode = ThemeMode.light;
       }
+    } else {
+      _themeMode = local;
     }
-    debugPrint(_themeMode.toString());
-    // notifyListeners();
+    debugPrint('_themeMode:' + _themeMode.toString());
+    notifyListeners();
   }
 }

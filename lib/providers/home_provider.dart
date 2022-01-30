@@ -21,7 +21,10 @@ class HomeProvider with ChangeNotifier {
 
   void initNowInfo(NowInfo nowInfo) {
     _nowInfo = nowInfo;
-    // notifyListeners();
+  }
+
+  void initDayInfo(List<DayInfo> dayInfo) {
+    _dayInfos = dayInfo;
   }
 
   void setDayInfos(List<DayInfo> dayInfos) {
@@ -41,7 +44,8 @@ class HomeProvider with ChangeNotifier {
   }
 
   Future<void> updateNowInfo() async {
-    _nowInfo = await HomeService().initData();
+    var res = await HomeService().initData();
+    _nowInfo = res['nowInfo'];
     notifyListeners();
   }
 }

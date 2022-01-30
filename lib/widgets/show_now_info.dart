@@ -1,13 +1,39 @@
-import 'package:dart_date/dart_date.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_neumorphic/flutter_neumorphic.dart';
 import 'package:provider/provider.dart';
 import 'package:tep_flutter/models/now_info.dart';
 import 'package:tep_flutter/providers/home_provider.dart';
-import 'package:tep_flutter/services/home_service.dart';
-import 'package:tep_flutter/widgets/style.dart';
+import 'package:tep_flutter/widgets/timer.dart';
 import 'package:tep_flutter/widgets/tools.dart';
 import 'package:intl/intl.dart';
-import 'dart:async';
+
+class LifecycleEventHandler extends WidgetsBindingObserver {
+  final AsyncCallback? resumeCallBack;
+  final AsyncCallback? suspendingCallBack;
+
+  LifecycleEventHandler({
+    this.resumeCallBack,
+    this.suspendingCallBack,
+  });
+
+  @override
+  Future<void> didChangeAppLifecycleState(AppLifecycleState state) async {
+    switch (state) {
+      case AppLifecycleState.resumed:
+        if (resumeCallBack != null) {
+          await resumeCallBack!();
+        }
+        break;
+      case AppLifecycleState.inactive:
+      case AppLifecycleState.paused:
+      case AppLifecycleState.detached:
+        if (suspendingCallBack != null) {
+          await suspendingCallBack!();
+        }
+        break;
+    }
+  }
+}
 
 class ShowNowInfo extends StatefulWidget {
   const ShowNowInfo({Key? key}) : super(key: key);
@@ -17,24 +43,25 @@ class ShowNowInfo extends StatefulWidget {
 }
 
 class _ShowNowInfoState extends State<ShowNowInfo> {
-  Timer? timer;
   late int _tepTypeIndex;
   @override
   void initState() {
     super.initState();
     _tepTypeIndex = context.read<HomeProvider>().nowInfo.tepType?.index ?? 0;
-    timer =
-        Timer.periodic(const Duration(seconds: 1), (Timer t) => initNowInfo());
+    WidgetsBinding.instance?.addObserver(
+        LifecycleEventHandler(resumeCallBack: () async => initNowInfo()));
   }
 
   @override
   void dispose() {
-    timer?.cancel();
     super.dispose();
   }
 
-  initNowInfo() {
-    context.read<HomeProvider>().updateTimer();
+  initNowInfo() async {
+    if (mounted) {
+      await context.read<HomeProvider>().updateNowInfo();
+    }
+    debugPrint('update NowInfo');
   }
 
   @override
@@ -81,27 +108,13 @@ class _ShowNowInfoState extends State<ShowNowInfo> {
         const SizedBox(
           height: 16,
         ),
-        Text(
-          nowInfo.now.format('jms'),
-          // DateFormat('MM/dd  kk:mm').format(nowInfo.now),
-          style: TextStyle(
-            fontWeight: FontWeight.w700,
-            fontSize: 36,
-            shadows: const [
-              Shadow(
-                  color: Colors.black38,
-                  offset: Offset(1.0, 1.0),
-                  blurRadius: 2)
-            ],
-            color: NeumorphicTheme.defaultTextColor(context),
-          ),
-        ),
+        const NowTimer(),
         const SizedBox(
-          height: 32,
+          height: 16,
         ),
         const Flexible(child: NeumorphicClock()),
         const SizedBox(
-          height: 32,
+          height: 16,
         ),
         Align(
           alignment: Alignment.bottomCenter,
@@ -311,7 +324,8 @@ class NeumorphicClock extends StatelessWidget {
   Widget _createDot(BuildContext context) {
     return Neumorphic(
       style: const NeumorphicStyle(
-        depth: -10,
+        depth: -4,
+        // intensity: .8,
         boxShape: NeumorphicBoxShape.circle(),
       ),
       child: const SizedBox(
