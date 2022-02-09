@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flex_color_scheme/flex_color_scheme.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_neumorphic/flutter_neumorphic.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
@@ -19,6 +20,7 @@ import 'tabs_page.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
@@ -102,7 +104,7 @@ class _MyAppState extends State<MyApp> {
       ],
 
       theme: FlexColorScheme.light(
-        scheme: FlexScheme.rosewood,
+        scheme: FlexScheme.hippieBlue,
         visualDensity: FlexColorScheme.comfortablePlatformDensity,
       )
           .copyWith(
@@ -118,7 +120,7 @@ class _MyAppState extends State<MyApp> {
           .toTheme,
       // The Mandy red, dark theme.
       darkTheme: FlexColorScheme.dark(
-        scheme: FlexScheme.rosewood,
+        scheme: FlexScheme.hippieBlue,
         visualDensity: FlexColorScheme.comfortablePlatformDensity,
       )
           .copyWith(
@@ -152,7 +154,7 @@ class _MyAppState extends State<MyApp> {
               switch (snapshot.connectionState) {
                 case ConnectionState.none:
                 case ConnectionState.waiting:
-                  return spinkit;
+                  return const SizedBox.shrink();
                 default:
                   if (snapshot.hasData) {
                     context

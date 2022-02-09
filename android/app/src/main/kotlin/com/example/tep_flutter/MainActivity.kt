@@ -1,4 +1,4 @@
-package com.example.tep_flutter
+package iailab.tep_flutter
 
 import io.flutter.embedding.android.FlutterActivity
 

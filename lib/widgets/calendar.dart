@@ -43,7 +43,7 @@ class _CalendarState extends State<Calendar> {
                 '時間電價日曆',
                 style: TextStyle(
                   fontSize: 24.0,
-                  fontWeight: FontWeight.bold,
+                  // fontWeight: FontWeight.bold,
                 ),
               ),
             ],

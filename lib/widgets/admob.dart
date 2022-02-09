@@ -50,7 +50,7 @@ class _GoogleBannerAdState extends State<GoogleBannerAd> {
 
     _inlineAdaptiveAd = BannerAd(
       //TODO: chang id when release
-      adUnitId: AdUnitId.testBannerId,
+      adUnitId: AdUnitId.bannerId,
       size: size,
       request: const AdRequest(),
       listener: BannerAdListener(
