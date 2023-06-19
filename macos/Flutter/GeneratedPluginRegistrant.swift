@@ -9,8 +9,8 @@ import cloud_firestore
 import firebase_analytics
 import firebase_auth
 import firebase_core
-import shared_preferences_macos
-import syncfusion_flutter_pdfviewer_macos
+import shared_preferences_foundation
+import syncfusion_pdfviewer_macos
 import url_launcher_macos
 
 func RegisterGeneratedPlugins(registry: FlutterPluginRegistry) {

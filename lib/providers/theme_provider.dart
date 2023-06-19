@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/scheduler.dart';
-import 'package:tep_flutter/services/sp_service.dart';
+import '../services/sp_service.dart';
 
 class ThemeChanger with ChangeNotifier {
-  final _brightness = SchedulerBinding.instance!.window.platformBrightness;
+  final _brightness =
+      WidgetsBinding.instance.platformDispatcher.platformBrightness;
   var _themeMode = ThemeMode.system;
   get getTheme => _themeMode;
 
@@ -24,7 +24,7 @@ class ThemeChanger with ChangeNotifier {
 
   Future<void> initThemeMode() async {
     ThemeMode local = await SpService().getThemeMode();
-    debugPrint('local:' + local.toString());
+    debugPrint('local:$local');
     if (local == ThemeMode.system) {
       if (_brightness == Brightness.dark) {
         _themeMode = ThemeMode.dark;
@@ -34,7 +34,7 @@ class ThemeChanger with ChangeNotifier {
     } else {
       _themeMode = local;
     }
-    debugPrint('_themeMode:' + _themeMode.toString());
+    debugPrint('_themeMode:$_themeMode');
     notifyListeners();
   }
 }

@@ -1,5 +1,5 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="iailab.tep_flutter">
+    package="iaialb.tep_flutter">
     <uses-permission android:name="android.permission.INTERNET" />
     <application
         android:label="時間電價"

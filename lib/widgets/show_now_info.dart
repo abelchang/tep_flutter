@@ -1,11 +1,13 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter_neumorphic/flutter_neumorphic.dart';
-import 'package:provider/provider.dart';
-import 'package:tep_flutter/models/now_info.dart';
-import 'package:tep_flutter/providers/home_provider.dart';
-import 'package:tep_flutter/widgets/timer.dart';
-import 'package:tep_flutter/widgets/tools.dart';
+// ignore: depend_on_referenced_packages
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
+
+import '../models/now_info.dart';
+import '../providers/home_provider.dart';
+import 'timer.dart';
+import 'tools.dart';
 
 class LifecycleEventHandler extends WidgetsBindingObserver {
   final AsyncCallback? resumeCallBack;
@@ -39,16 +41,17 @@ class ShowNowInfo extends StatefulWidget {
   const ShowNowInfo({Key? key}) : super(key: key);
 
   @override
-  _ShowNowInfoState createState() => _ShowNowInfoState();
+  State<ShowNowInfo> createState() => _ShowNowInfoState();
 }
 
 class _ShowNowInfoState extends State<ShowNowInfo> {
   late int _tepTypeIndex;
+  NowInfo get nowInfo => context.watch<HomeProvider>().nowInfo;
   @override
   void initState() {
     super.initState();
     _tepTypeIndex = context.read<HomeProvider>().nowInfo.tepType?.index ?? 0;
-    WidgetsBinding.instance?.addObserver(
+    WidgetsBinding.instance.addObserver(
         LifecycleEventHandler(resumeCallBack: () async => initNowInfo()));
   }
 
@@ -66,7 +69,6 @@ class _ShowNowInfoState extends State<ShowNowInfo> {
 
   @override
   Widget build(BuildContext context) {
-    NowInfo nowInfo = context.watch<HomeProvider>().nowInfo;
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
@@ -92,6 +94,7 @@ class _ShowNowInfoState extends State<ShowNowInfo> {
                       fontWeight: FontWeight.w200,
                       fontSize: 18,
                     ),
+                    maxLines: 1,
                   ),
                   Text(
                     (nowInfo.holidayType as HolidayType).label,
@@ -112,7 +115,10 @@ class _ShowNowInfoState extends State<ShowNowInfo> {
         const SizedBox(
           height: 16,
         ),
-        const Flexible(child: NeumorphicClock()),
+        Flexible(
+            child: NeumorphicClock(
+          nowInfo: nowInfo,
+        )),
         const SizedBox(
           height: 16,
         ),
@@ -188,7 +194,9 @@ class _ShowNowInfoState extends State<ShowNowInfo> {
 }
 
 class NeumorphicClock extends StatelessWidget {
-  const NeumorphicClock({Key? key}) : super(key: key);
+  const NeumorphicClock({Key? key, required this.nowInfo}) : super(key: key);
+
+  final NowInfo nowInfo;
 
   @override
   Widget build(BuildContext context) {
@@ -228,11 +236,7 @@ class NeumorphicClock extends StatelessWidget {
                           child: Column(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              Text((context
-                                      .watch<HomeProvider>()
-                                      .nowInfo
-                                      .timeType as TimeType)
-                                  .label),
+                              Text((nowInfo.timeType as TimeType).label),
                               RichText(
                                 text: TextSpan(
                                   text: '每度  ',
@@ -246,10 +250,7 @@ class NeumorphicClock extends StatelessWidget {
                                     TextSpan(
                                       text: NumberFormat.simpleCurrency(
                                               decimalDigits: 2)
-                                          .format(context
-                                              .watch<HomeProvider>()
-                                              .nowInfo
-                                              .price),
+                                          .format(nowInfo.price),
                                       style: const TextStyle(
                                         fontSize: 40.0,
                                         fontWeight: FontWeight.bold,
@@ -267,13 +268,18 @@ class NeumorphicClock extends StatelessWidget {
                                 ),
                               ),
                               const SizedBox(
+                                height: 16,
+                              ),
+                              Text((nowInfo.tepType as TepType).label),
+                              const SizedBox(
                                 height: 24,
                               ),
-                              Text((context
-                                      .watch<HomeProvider>()
-                                      .nowInfo
-                                      .tepType as TepType)
-                                  .label),
+                              nowInfo.holidayType == HolidayType.nonholiday
+                                  ? nextPeriod(context, nowInfo)
+                                  : const Text(
+                                      '全日離峰',
+                                      style: TextStyle(color: Colors.grey),
+                                    ),
                             ],
                           ),
                         ),
@@ -318,6 +324,26 @@ class NeumorphicClock extends StatelessWidget {
           ),
         ),
       ),
+    );
+  }
+
+  Widget nextPeriod(BuildContext context, NowInfo nowInfo) {
+    return Column(
+      children: [
+        Text(
+          '下時段  ${(nowInfo.nextTimeType)?.label}',
+          style: const TextStyle(color: Colors.grey),
+        ),
+        Text(
+          '${nowInfo.nextTimeStart.hour.toString().padLeft(2, '0')}:${nowInfo.nextTimeStart.minute.toString().padLeft(2, '0')} - ${nowInfo.nextTimeEnd.hour.toString().padLeft(2, '0')}:${nowInfo.nextTimeEnd.minute.toString().padLeft(2, '0')}',
+          style: const TextStyle(color: Colors.grey),
+        ),
+        Text(
+          NumberFormat.simpleCurrency(decimalDigits: 2)
+              .format(nowInfo.nextPrice),
+          style: const TextStyle(color: Colors.grey),
+        ),
+      ],
     );
   }
 

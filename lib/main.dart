@@ -5,18 +5,19 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flex_color_scheme/flex_color_scheme.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_neumorphic/flutter_neumorphic.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:provider/provider.dart';
-import 'package:tep_flutter/firebase_options.dart';
-import 'package:tep_flutter/providers/home_provider.dart';
-import 'package:tep_flutter/providers/theme_provider.dart';
-import 'package:tep_flutter/screens/home.dart';
-import 'package:tep_flutter/services/home_service.dart';
-import 'package:tep_flutter/widgets/style.dart';
-import 'package:flutter_localizations/flutter_localizations.dart';
+
+import 'firebase_options.dart';
+import 'providers/home_provider.dart';
+import 'providers/theme_provider.dart';
+import 'screens/home.dart';
+import 'services/home_service.dart';
 import 'tabs_page.dart';
+import 'widgets/style.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -110,12 +111,7 @@ class _MyAppState extends State<MyApp> {
           .copyWith(
             scaffoldBackground: whiteBackground,
             background: whiteBackground,
-            textTheme: const TextTheme(
-              headline6: TextStyle(
-                  // color: whiteSmoke,
-                  fontSize: 18,
-                  fontWeight: FontWeight.normal),
-            ),
+            textTheme: const TextTheme(),
           )
           .toTheme,
       // The Mandy red, dark theme.
@@ -126,12 +122,7 @@ class _MyAppState extends State<MyApp> {
           .copyWith(
             scaffoldBackground: backGroundBlack,
             background: Colors.black,
-            textTheme: const TextTheme(
-              headline6: TextStyle(
-                  // color: backGroundBlack,
-                  fontSize: 18,
-                  fontWeight: FontWeight.normal),
-            ),
+            textTheme: const TextTheme(),
           )
           .toTheme,
       themeMode: themeMode,
@@ -201,7 +192,7 @@ class MyHomePage extends StatefulWidget {
   final FirebaseAnalyticsObserver observer;
 
   @override
-  _MyHomePageState createState() => _MyHomePageState();
+  State<MyHomePage> createState() => _MyHomePageState();
 }
 
 class _MyHomePageState extends State<MyHomePage> {

@@ -1,19 +1,21 @@
+import 'package:dart_date/dart_date.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_neumorphic/flutter_neumorphic.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
-import 'package:dart_date/dart_date.dart';
-import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
-import 'package:tep_flutter/providers/home_provider.dart';
-import 'package:tep_flutter/widgets/tools.dart';
-import 'package:provider/provider.dart';
+// ignore: depend_on_referenced_packages
 import 'package:intl/intl.dart';
+import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
+import 'package:provider/provider.dart';
+
+import '../providers/home_provider.dart';
+import 'tools.dart';
 
 class CalTep extends StatefulWidget {
   const CalTep({Key? key}) : super(key: key);
 
   @override
-  _CalTepState createState() => _CalTepState();
+  State<CalTep> createState() => _CalTepState();
 }
 
 class _CalTepState extends State<CalTep> {
@@ -65,6 +67,7 @@ class _CalTepState extends State<CalTep> {
     InterstitialAd.load(
         //TODO: chang id when release
         adUnitId: AdUnitId.interstitialId,
+        // adUnitId: AdUnitId.testInterstitialId,
         request: const AdRequest(),
         adLoadCallback: InterstitialAdLoadCallback(
           onAdLoaded: (InterstitialAd ad) {
@@ -498,9 +501,10 @@ class _CalTepState extends State<CalTep> {
                             _calTepPrice();
                           }
                         },
-                        child: const Text('開始計算'),
                         style: ElevatedButton.styleFrom(
-                            primary: Theme.of(context).colorScheme.secondary),
+                            backgroundColor:
+                                Theme.of(context).colorScheme.secondary),
+                        child: const Text('開始計算'),
                       ),
                       const SizedBox(
                         height: 64,
@@ -522,16 +526,16 @@ class _CalTepState extends State<CalTep> {
       child: Row(
         children: [
           CircleAvatar(
-            child: Text('$no'),
             backgroundColor: Theme.of(context).colorScheme.primary,
             foregroundColor: Colors.white,
+            child: Text('$no'),
           ),
           const SizedBox(
             width: 16,
           ),
           Text(
             title,
-            style: Theme.of(context).textTheme.headline6,
+            // style: Theme.of(context).textTheme.headline6,
           ),
         ],
       ),
@@ -656,21 +660,21 @@ class _CalTepState extends State<CalTep> {
                   height: 16,
                 ),
                 Text(
-                  DateTime.now().year.toString() + '年',
+                  '${DateTime.now().year}年',
                   style: const TextStyle(
                     fontSize: 24.0,
                     fontWeight: FontWeight.w300,
                   ),
                 ),
                 Text(
-                  '夏月(6-9月)離峰日有：' + tepPrice.summerOffDay.toString() + '天',
+                  '夏月(6-9月)離峰日有：${tepPrice.summerOffDay}天',
                   style: const TextStyle(
                     // fontSize: 32.0,
                     fontWeight: FontWeight.w300,
                   ),
                 ),
                 Text(
-                  '非夏月離峰日有：' + tepPrice.nonsummerOffDay.toString() + '天',
+                  '非夏月離峰日有：${tepPrice.nonsummerOffDay}天',
                   style: const TextStyle(
                     // fontSize: 32.0,
                     fontWeight: FontWeight.w300,
@@ -681,9 +685,9 @@ class _CalTepState extends State<CalTep> {
                   margin: const EdgeInsets.only(top: 32, bottom: 8),
                   child: ListTile(
                     leading: CircleAvatar(
-                      child: const Text('1'),
                       backgroundColor: Theme.of(context).colorScheme.primary,
                       foregroundColor: Colors.white,
+                      child: const Text('1'),
                     ),
                     title: const Text('住商型簡易時間電價(三段式)'),
                     subtitle: RichText(
@@ -692,7 +696,7 @@ class _CalTepState extends State<CalTep> {
                         style: TextStyle(
                           color: Theme.of(context)
                               .textTheme
-                              .bodyText1
+                              .bodyLarge
                               ?.color
                               ?.withOpacity(.8),
                           // fontSize: 32.0,
@@ -725,9 +729,9 @@ class _CalTepState extends State<CalTep> {
                   margin: const EdgeInsets.only(top: 8, bottom: 8),
                   child: ListTile(
                     leading: CircleAvatar(
-                      child: const Text('2'),
                       backgroundColor: Theme.of(context).colorScheme.primary,
                       foregroundColor: Colors.white,
+                      child: const Text('2'),
                     ),
                     title: const Text('住商型簡易時間電價(二段式)'),
                     subtitle: RichText(
@@ -736,7 +740,7 @@ class _CalTepState extends State<CalTep> {
                         style: TextStyle(
                           color: Theme.of(context)
                               .textTheme
-                              .bodyText1
+                              .bodyLarge
                               ?.color
                               ?.withOpacity(.8),
                           // fontSize: 32.0,
@@ -769,9 +773,9 @@ class _CalTepState extends State<CalTep> {
                   margin: const EdgeInsets.only(top: 8, bottom: 32),
                   child: ListTile(
                     leading: CircleAvatar(
-                      child: const Text('3'),
                       backgroundColor: Theme.of(context).colorScheme.primary,
                       foregroundColor: Colors.white,
+                      child: const Text('3'),
                     ),
                     title: const Text('非時間電價 : 非營業'),
                     subtitle: RichText(
@@ -780,7 +784,7 @@ class _CalTepState extends State<CalTep> {
                         style: TextStyle(
                           color: Theme.of(context)
                               .textTheme
-                              .bodyText1
+                              .bodyLarge
                               ?.color
                               ?.withOpacity(.8),
                           // fontSize: 32.0,

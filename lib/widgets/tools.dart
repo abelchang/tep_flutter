@@ -20,6 +20,40 @@ class AdUnitId {
       : 'ca-app-pub-1486315568349807/8413543619';
 }
 
+class TimeofDayPeriod {
+  static const summer2PeekTimeStart = TimeOfDay(hour: 9, minute: 00);
+  static const summer2PeekTimeEnd = TimeOfDay(hour: 23, minute: 59);
+  static const summer2OffPeakTimeStart = TimeOfDay(hour: 00, minute: 00);
+  static const summer2OffPeakTimeEnd = TimeOfDay(hour: 8, minute: 59);
+
+  static const nonSummer2PeekTime1Start = TimeOfDay(hour: 6, minute: 00);
+  static const nonSummer2PeekTime1End = TimeOfDay(hour: 10, minute: 59);
+  static const nonSummer2PeekTime2Start = TimeOfDay(hour: 14, minute: 00);
+  static const nonSummer2PeekTime2End = TimeOfDay(hour: 23, minute: 59);
+  static const nonSummer2OffPeekTime1Start = TimeOfDay(hour: 00, minute: 00);
+  static const nonSummer2OffPeekTime1End = TimeOfDay(hour: 5, minute: 59);
+  static const nonSummer2OffPeekTime2Start = TimeOfDay(hour: 11, minute: 00);
+  static const nonSummer2OffPeekTime2End = TimeOfDay(hour: 13, minute: 59);
+
+  static const summer3PeekTimeStart = TimeOfDay(hour: 16, minute: 00);
+  static const summer3PeekTimeEnd = TimeOfDay(hour: 21, minute: 59);
+  static const summer3HalfPeekTime1Start = TimeOfDay(hour: 9, minute: 00);
+  static const summer3HalfPeekTime1End = TimeOfDay(hour: 15, minute: 59);
+  static const summer3HalfPeekTime2Start = TimeOfDay(hour: 22, minute: 00);
+  static const summer3HalfPeekTime2End = TimeOfDay(hour: 23, minute: 59);
+  static const summer3OffPeekTimeStart = TimeOfDay(hour: 00, minute: 00);
+  static const summer3OffPeekTimeEnd = TimeOfDay(hour: 8, minute: 59);
+
+  static const nonSummer3PeekTime1Start = TimeOfDay(hour: 6, minute: 00);
+  static const nonSummer3PeekTime1End = TimeOfDay(hour: 10, minute: 59);
+  static const nonSummer3PeekTime2Start = TimeOfDay(hour: 14, minute: 00);
+  static const nonSummer3PeekTime2End = TimeOfDay(hour: 23, minute: 59);
+  static const nonSummer3OffPeekTime1Start = TimeOfDay(hour: 00, minute: 00);
+  static const nonSummer3OffPeekTime1End = TimeOfDay(hour: 5, minute: 59);
+  static const nonSummer3OffPeekTime2Start = TimeOfDay(hour: 11, minute: 00);
+  static const nonSummer3OffPeekTime2End = TimeOfDay(hour: 13, minute: 59);
+}
+
 enum HolidayType {
   nonholiday,
   holiday,
@@ -68,14 +102,14 @@ extension DateOnisSameDatelyCompare on DateTime {
 }
 
 class TePrice {
-  static double sumerOffPeak = 1.8;
-  static double nonSumerOffPeak = 1.73;
-  static double sunmer2Peak = 4.44;
-  static double nonSunmer2Peak = 4.23;
-  static double sunmer3Peak = 6.2;
-  static double sunmer3HalfPeak = 4.07;
-  static double nonsunmer3Peak = 3.88;
-  static double nonsunmer3HalfPeak = 3.88;
+  static double sumerOffPeak = 1.85;
+  static double nonSumerOffPeak = 1.78;
+  static double sunmer2Peak = 4.71;
+  static double nonSunmer2Peak = 4.48;
+  static double sunmer3Peak = 6.49;
+  static double sunmer3HalfPeak = 4.26;
+  static double nonsunmer3Peak = 4.06;
+  static double nonsunmer3HalfPeak = 4.06;
 }
 
 class NormalPrice {
@@ -84,13 +118,13 @@ class NormalPrice {
   static double under500Summer = 3.52;
   static double under700Summer = 4.8;
   static double under1000Summer = 5.66;
-  static double up1000Summer = 6.41;
+  static double up1000Summer = 6.99;
   static double uder120NonSummer = 1.63;
   static double under330NonSummer = 2.1;
   static double under500NonSummer = 2.89;
   static double under700NonSummer = 3.94;
   static double under1000NonSummer = 4.6;
-  static double up1000NonSummer = 5.03;
+  static double up1000NonSummer = 5.48;
 
   double getUnder120Price(int type) {
     if (type == 0) {

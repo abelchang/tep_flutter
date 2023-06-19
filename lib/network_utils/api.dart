@@ -3,9 +3,10 @@ import 'dart:convert';
 // ignore: unused_import
 import 'dart:developer';
 import 'dart:io';
+
 import 'package:dio/adapter.dart';
-import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 
 class Network {
@@ -66,7 +67,7 @@ class Network {
         };
         debugPrint(e.message);
         if (e.response != null) {
-          debugPrint('response:' + e.response.toString());
+          debugPrint('response:${e.response}');
         }
       }
 
@@ -186,7 +187,7 @@ class Network {
         'message': e.message,
       };
       if (e.response != null) {
-        debugPrint('response:' + e.response.toString());
+        debugPrint('response:${e.response}');
       }
 
       return result;

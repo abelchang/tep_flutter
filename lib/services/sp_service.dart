@@ -2,9 +2,10 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:tep_flutter/models/day_info.dart';
-import 'package:tep_flutter/services/day_service.dart';
-import 'package:tep_flutter/widgets/tools.dart';
+
+import '../models/day_info.dart';
+import '../widgets/tools.dart';
+import 'day_service.dart';
 
 class SpService {
   Future<List<DayInfo>> getDayInfos() async {
@@ -18,7 +19,6 @@ class SpService {
     }
     if (dayInfos.isEmpty || dayInfos[0].date.year != DateTime.now().year) {
       dayInfos = await DayInfoService().getDayInofs(DateTime.now().year);
-      localStorage.setString('dayInfos', json.encode(dayInfos));
     }
     return dayInfos;
   }
@@ -56,12 +56,12 @@ class SpService {
     debugPrint('in getThemeMode');
     SharedPreferences localStorage = await SharedPreferences.getInstance();
     var themeModeData = localStorage.getInt("themeMode");
-    debugPrint('sp getThemeMode:' + themeModeData.toString());
+    debugPrint('sp getThemeMode:$themeModeData');
     if (themeModeData == null) {
       return ThemeMode.system;
     }
     final themeMode = ThemeMode.values[themeModeData];
-    debugPrint('convert getThemeMode:' + themeMode.toString());
+    debugPrint('convert getThemeMode:$themeMode');
     switch (themeMode) {
       case ThemeMode.light:
         debugPrint('switch ThemeMode.light');

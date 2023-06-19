@@ -1,10 +1,11 @@
 import 'package:dart_date/dart_date.dart';
 import 'package:flutter_neumorphic/flutter_neumorphic.dart';
 import 'package:provider/provider.dart';
-import 'package:tep_flutter/models/day_info.dart';
-import 'package:tep_flutter/providers/home_provider.dart';
 import 'package:syncfusion_flutter_calendar/calendar.dart';
-import 'package:tep_flutter/widgets/tools.dart';
+
+import '../models/day_info.dart';
+import '../providers/home_provider.dart';
+import 'tools.dart';
 
 class Calendar extends StatefulWidget {
   const Calendar({Key? key}) : super(key: key);
@@ -133,7 +134,7 @@ class _CalendarState extends State<Calendar> {
         Theme.of(buildContext).colorScheme.brightness == Brightness.dark
             ? Colors.white
             : Colors.black54;
-    debugPrint(details.toString());
+    // debugPrint(details.toString());
     // final bool isBestPrice = airFare.fare == _kBestPrice;
     // final bool isDisabledDate =
     //     details.date.isBefore(_minDate) && !isSameDate(details.date, _minDate);

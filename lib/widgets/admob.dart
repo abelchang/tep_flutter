@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
-import 'package:tep_flutter/widgets/tools.dart';
+
+import 'tools.dart';
 
 class GoogleBannerAd extends StatefulWidget {
   const GoogleBannerAd({Key? key}) : super(key: key);
 
   @override
-  _GoogleBannerAdState createState() => _GoogleBannerAdState();
+  State<GoogleBannerAd> createState() => _GoogleBannerAdState();
 }
 
 class _GoogleBannerAdState extends State<GoogleBannerAd> {
@@ -51,6 +52,7 @@ class _GoogleBannerAdState extends State<GoogleBannerAd> {
     _inlineAdaptiveAd = BannerAd(
       //TODO: chang id when release
       adUnitId: AdUnitId.bannerId,
+      // adUnitId: AdUnitId.testBannerId,
       size: size,
       request: const AdRequest(),
       listener: BannerAdListener(

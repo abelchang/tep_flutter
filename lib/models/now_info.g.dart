@@ -15,6 +15,15 @@ NowInfo _$NowInfoFromJson(Map<String, dynamic> json) => NowInfo(
       price: (json['price'] as num?)?.toDouble(),
       now: DateTime.parse(json['now'] as String),
       holidayNmae: json['holidayNmae'] as String?,
+      nextPrice: (json['nextPrice'] as num?)?.toDouble(),
+      nextTimeEnd: json['nextTimeEnd'] == null
+          ? TimeofDayPeriod.nonSummer2OffPeekTime1End
+          : timeofDayPeriodFormJson(json['nextTimeEnd'] as String),
+      nextTimeStart: json['nextTimeStart'] == null
+          ? TimeofDayPeriod.nonSummer2OffPeekTime1Start
+          : timeofDayPeriodFormJson(json['nextTimeStart'] as String),
+      nextTimeType:
+          $enumDecodeNullable(_$TimeTypeEnumMap, json['nextTimeType']),
     );
 
 Map<String, dynamic> _$NowInfoToJson(NowInfo instance) => <String, dynamic>{
@@ -25,6 +34,10 @@ Map<String, dynamic> _$NowInfoToJson(NowInfo instance) => <String, dynamic>{
       'price': instance.price,
       'now': instance.now.toIso8601String(),
       'holidayNmae': instance.holidayNmae,
+      'nextTimeType': _$TimeTypeEnumMap[instance.nextTimeType],
+      'nextPrice': instance.nextPrice,
+      'nextTimeStart': timeofDayPeriodToJson(instance.nextTimeStart),
+      'nextTimeEnd': timeofDayPeriodToJson(instance.nextTimeEnd),
     };
 
 const _$HolidayTypeEnumMap = {

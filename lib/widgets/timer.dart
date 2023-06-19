@@ -1,14 +1,17 @@
 import 'dart:async';
+
 import 'package:flutter_neumorphic/flutter_neumorphic.dart';
-import 'package:provider/provider.dart';
-import 'package:tep_flutter/providers/home_provider.dart';
+// ignore: depend_on_referenced_packages
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
+
+import '../providers/home_provider.dart';
 
 class NowTimer extends StatefulWidget {
   const NowTimer({Key? key}) : super(key: key);
 
   @override
-  _NowTimerState createState() => _NowTimerState();
+  State<NowTimer> createState() => _NowTimerState();
 }
 
 class _NowTimerState extends State<NowTimer> {
@@ -69,7 +72,7 @@ class _NowTimerState extends State<NowTimer> {
                 ),
               ),
               TextSpan(
-                text: '   ' + DateFormat('a').format(now),
+                text: '   ${DateFormat('a').format(now)}',
                 style: const TextStyle(
                   letterSpacing: 0,
                   fontSize: 18.0,

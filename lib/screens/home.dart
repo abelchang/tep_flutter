@@ -9,7 +9,6 @@ import 'package:flutter_neumorphic/flutter_neumorphic.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:provider/provider.dart';
 import 'package:syncfusion_flutter_pdfviewer/pdfviewer.dart';
-
 import 'package:tep_flutter/providers/theme_provider.dart';
 import 'package:tep_flutter/widgets/admob.dart';
 import 'package:tep_flutter/widgets/calendar.dart';
@@ -70,33 +69,15 @@ class Home extends StatelessWidget {
                 color: Theme.of(context).iconTheme.color,
               ),
               onPressed: () async {
-                _progress = 0;
-                _timer?.cancel();
-                _timer = Timer.periodic(const Duration(milliseconds: 100),
-                    (Timer timer) {
-                  EasyLoading.showProgress(_progress,
-                      status:
-                          '${(_progress * 100).toStringAsFixed(0)}%\n\n電價說明以台電官方公告為準\n稍後將會開啟台電電價表');
-                  _progress += 0.05;
-                  if (_progress >= 1) {
-                    _timer?.cancel();
-                    EasyLoading.dismiss();
-                    if (Platform.isIOS) {
-                      launch(
-                          'https://www.taipower.com.tw/upload/238/2021101315451523922.pdf',
-                          forceSafariVC: false);
-                    } else {
-                      showBarModalBottomSheet(
-                        expand: true,
-                        context: context,
-                        backgroundColor: Colors.transparent,
-                        builder: (context) => SfPdfViewer.asset(
-                            'assets/files/2021101315451523922.pdf',
-                            scrollDirection: PdfScrollDirection.horizontal),
-                      );
-                    }
-                  }
-                });
+                final url = Uri.parse(
+                  'https://taipowerdsm.taipower.com.tw/residential-and-commercial#',
+                );
+                if (await canLaunchUrl(url)) {
+                  launchUrl(url);
+                } else {
+                  // ignore: avoid_print
+                  print("Can't launch $url");
+                }
               },
             ),
             IconButton(
@@ -113,8 +94,8 @@ class Home extends StatelessWidget {
           ],
         ),
       ),
-      body: Column(
-        children: const [
+      body: const Column(
+        children: [
           SizedBox(
             height: 32,
           ),
